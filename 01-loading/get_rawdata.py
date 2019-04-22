@@ -14,9 +14,9 @@ import pandas as pd
 from sklearn.datasets import fetch_california_housing
 
 config = ConfigParser()
-config.read("../config.ini")
+config.read("config.ini")
 
-csv_path = Path("..").joinpath(config["data"]["raw"])
+csv_path = Path(config["data"]["raw"])
 data_dir =  csv_path.parent
 target_name = config["data"]["target"]
 

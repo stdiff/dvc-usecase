@@ -5,24 +5,26 @@ An elastic net as a baseline
 import warnings
 warnings.filterwarnings("ignore")
 
+import sys
 from configparser import ConfigParser
 from pathlib import Path
 
 import pandas as pd
 import joblib
 
+sys.path.append("03-modeling")
 from utils import Metric
 
 ## load configuration
 config = ConfigParser()
-config.read("../config.ini")
+config.read("config.ini")
 
 tz = config["general"]["tz"]
-training_data = Path("..").joinpath(config["data"]["training"])
-test_data = Path("..").joinpath(config["data"]["test"])
+training_data = Path(config["data"]["training"])
+test_data = Path(config["data"]["test"])
 target_name = config["data"]["target"]
-model_path = Path("..").joinpath(config["model"]["model"])
-metric_path = Path("..").joinpath(config["model"]["metric"])
+model_path = Path(config["model"]["model"])
+metric_path = Path(config["model"]["metric"])
 
 
 if __name__ == "__main__":

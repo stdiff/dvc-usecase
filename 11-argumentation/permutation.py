@@ -7,11 +7,11 @@ from itertools import permutations
 from configparser import ConfigParser
 from pathlib import Path
 
-## load configuraion
+## load configuration
 config = ConfigParser()
-config.read("../config.ini")
-img_original_path = Path("..").joinpath(config["image"]["img_original"])
-dir_manipulated = Path("..").joinpath(config["image"]["dir_manipulated"])
+config.read("config.ini")
+img_original_path = Path(config["image"]["img_original"])
+dir_manipulated = Path(config["image"]["dir_manipulated"])
 
 if __name__ == "__main__":
     img_original = imread(str(img_original_path))

@@ -11,11 +11,11 @@ from sklearn.model_selection import train_test_split
 
 ## load configuration
 config = ConfigParser()
-config.read("../config.ini")
+config.read("config.ini")
 
-raw_path = Path("..").joinpath(config["data"]["raw"])
-training_set_path = Path("..").joinpath(config["data"]["training"])
-test_set_path = Path("..").joinpath(config["data"]["test"])
+raw_path = Path(config["data"]["raw"])
+training_set_path = Path(config["data"]["training"])
+test_set_path = Path(config["data"]["test"])
 
 
 @click.command()
