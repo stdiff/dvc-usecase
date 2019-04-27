@@ -2,7 +2,7 @@
 
 source <(run/configuration-parser.py --ini config.ini)
 
-dvc run -d ${data[raw]} -d ${script[loading]} \
+dvc run -d ${data[raw]} -d ${script[processing]} \
         -o ${data[training]} -o ${data[test]} \
         -f run/02-processing.dvc \
         --overwrite-dvcfile \
