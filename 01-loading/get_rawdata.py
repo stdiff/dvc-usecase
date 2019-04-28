@@ -6,6 +6,7 @@ Since this is just a prototype, we do not implement any complicated logic
 (such as stacking data set without duplicate).
 """
 
+import click
 from pathlib import Path
 from configparser import ConfigParser
 
@@ -41,27 +42,21 @@ def sampling(target_name:str="MedHouseVal", sampling_rate:float=0.2,
     df[target_name] = data.target
 
     ## sampling
-    chunk_size = int(sampling_rate*df.shape[0])
-    sampled_rows = np.random.randint(df.shape[0], size=chunk_size)
+    scores = np.random.uniform(low=0, high=1, size=df.shape[0])
+    selected = scores < sampling_rate
 
-    return df.iloc[sampled_rows,:].copy()
+    return df.iloc[selected,:].copy()
+
+
+@click.command()
+@click.option("--round", default=1, type=int)
+def fetch_data(round:int=1):
+    sampling_rate = 0.2*round
+    df_sampled = sampling(target_name=target_name, sampling_rate=sampling_rate, seed=seed)
+
+    df_sampled.to_csv(str(csv_path), index_label=False)
+    print("New data: %s" % csv_path)
+    print("# rows  : %s" % df_sampled.shape[0])
 
 if __name__ == "__main__":
-
-    if csv_path.exists():
-        ## data exists => shifting the random seed => sampling data
-        df_stacked = pd.read_csv(str(csv_path))
-        print("You have already %s rows" % df_stacked.shape[0])
-
-        df_sampled = sampling(target_name=target_name, sampling_rate=sampling_rate,
-                              seed=seed + df_stacked.shape[0])
-
-        df_stacked = pd.concat([df_stacked, df_sampled], axis=0)
-
-    else:
-        ## no data exists => just sampling data
-        df_stacked = sampling(target_name=target_name, sampling_rate=sampling_rate, seed=seed)
-        print("You have no data yet.")
-
-    df_stacked.to_csv(str(csv_path), index_label=False)
-    print("New rows are added to %s" % csv_path)
+    fetch_data()
