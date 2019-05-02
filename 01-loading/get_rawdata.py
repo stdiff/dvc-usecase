@@ -14,12 +14,14 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 
+from utils import DataFrameMetric
+
 config = ConfigParser()
 config.read("config.ini")
 
-csv_path = Path(config["data"]["raw"])
-data_dir =  csv_path.parent
-target_name = config["data"]["target"]
+csv_path = Path(config["load"]["raw"])
+metric_path = Path(config["load"]["metric"])
+target_name = config["general"]["target"]
 
 sampling_rate = 0.2
 seed = 51
@@ -54,9 +56,12 @@ def fetch_data(round:int=1):
     sampling_rate = 0.2*round
     df_sampled = sampling(target_name=target_name, sampling_rate=sampling_rate, seed=seed)
 
+    with DataFrameMetric(metric_path, name="housing") as metric:
+        metric.add_data(raw=df_sampled)
+
     df_sampled.to_csv(str(csv_path), index_label=False)
-    print("New data: %s" % csv_path)
-    print("# rows  : %s" % df_sampled.shape[0])
+
+
 
 if __name__ == "__main__":
     fetch_data()

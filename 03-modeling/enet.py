@@ -5,24 +5,22 @@ An elastic net as a baseline
 import warnings
 warnings.filterwarnings("ignore")
 
-import sys
 from configparser import ConfigParser
 from pathlib import Path
 
 import pandas as pd
 import joblib
 
-sys.path.append("03-modeling")
-from utils import Metric
+from utils import RMSEMetric
 
 ## load configuration
 config = ConfigParser()
 config.read("config.ini")
 
 tz = config["general"]["tz"]
-training_data = Path(config["data"]["training"])
-test_data = Path(config["data"]["test"])
-target_name = config["data"]["target"]
+training_data = Path(config["process"]["training"])
+test_data = Path(config["process"]["test"])
+target_name = config["general"]["target"]
 model_path = Path(config["model"]["model"])
 metric_path = Path(config["model"]["metric"])
 
@@ -48,15 +46,14 @@ if __name__ == "__main__":
     model.fit(df_train.drop(target_name, axis=1), df_train[target_name])
 
     ## write metric
-    metric = Metric(str(metric_path), tz=tz)
-    metric.read_off_cv_results_(model)
+    with RMSEMetric(str(metric_path), tz=tz) as metric:
+        metric.read_off_cv_results_(model)
 
-    yhat_train = model.predict(df_train.drop(target_name, axis=1))
-    metric.rmse_train = mean_squared_error(df_train[target_name], yhat_train)
+        yhat_train = model.predict(df_train.drop(target_name, axis=1))
+        metric.rmse_train = mean_squared_error(df_train[target_name], yhat_train)
 
-    df_test = pd.read_csv(test_data)
-    yhat_test = model.predict(df_test.drop(target_name, axis=1))
-    metric.rmse_test = mean_squared_error(df_test[target_name], yhat_test)
+        df_test = pd.read_csv(test_data)
+        yhat_test = model.predict(df_test.drop(target_name, axis=1))
+        metric.rmse_test = mean_squared_error(df_test[target_name], yhat_test)
 
-    metric.save_metrics()
     joblib.dump(model.best_estimator_, model_path)
