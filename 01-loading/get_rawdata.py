@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
 from utils import DataFrameMetric
 
 config = ConfigParser()

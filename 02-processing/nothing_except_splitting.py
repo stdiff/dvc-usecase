@@ -9,6 +9,8 @@ import click
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
 from utils import DataFrameMetric
 
 ## load configuration

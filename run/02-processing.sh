@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-export PYTHONPATH="$PYTHONPATH:$PWD"
-
 source <(run/configuration-parser.py --ini config.ini)
 
 dvc run -d ${load[raw]} -d ${script[processing]} \
