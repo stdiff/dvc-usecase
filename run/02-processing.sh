@@ -2,9 +2,9 @@
 
 source <(run/configuration-parser.py --ini config.ini)
 
-dvc run -d ${load[raw]} -d ${script[processing]} \
-        -o ${process[training]} -o ${process[test]} \
+dvc run -d ${loading_housing[raw_data]} -d ${processing[script]} \
+        -o ${processing[training]} -o ${processing[test]} \
         -f run/02-processing.dvc \
-        -M ${process[metric]} \
+        -M ${processing[metric]} \
         --overwrite-dvcfile \
-        python ${script[processing]} --test_size 0.4 --random_state 42
+        python ${processing[entry_point]} --test_size 0.4 --random_state 42

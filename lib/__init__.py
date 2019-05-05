@@ -34,9 +34,12 @@ class Metric:
         self.timestamp = datetime.now(tz=self.tz).isoformat(sep=" ")
 
         with self.metric_path.open("w") as fo:
+            width = max(len(key) for key in self.keys)
+
             for key in self.keys:
                 val = getattr(self, key)
-                fo.write("%s: %s\n" % (key, val))
+                padding = " " * (width - len(key))
+                fo.write("%s" % key + padding + ": %s\n" % val)
 
     def __enter__(self):
         return self
@@ -74,17 +77,13 @@ class DataFrameMetric(Metric):
             if not isinstance(val,pd.DataFrame):
                 raise ValueError("The given data must be pandas DataFrame.")
 
-            key_nrow = "%s_nrow" % key
-            self.keys.append(key_nrow)
-            setattr(self, key_nrow, val.shape[0])
-
-            key_ncol = "%s_ncol" % key
-            self.keys.append(key_ncol)
-            setattr(self, key_ncol, val.shape[1])
+            key_shape = "%s_shape" % key
+            self.keys.append(key_shape)
+            setattr(self, key_shape, "%s x %s" % val.shape )
 
 
 class RMSEMetric(Metric):
-    def __init__(self, metric_path:str, tz:str="UTC"):
+    def __init__(self, metric_path:str, name:str, tz:str="UTC"):
         """
         Metric object for regression (RMSE)
 
@@ -92,6 +91,7 @@ class RMSEMetric(Metric):
         :param tz: timezone such as "UTC".
         """
         super().__init__(metric_path, tz)
+        self.name = name
         self.keys.extend(["rmse_test",
                           "rmse_train",
                           "mean_rmse_validation",

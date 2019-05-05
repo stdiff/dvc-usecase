@@ -2,9 +2,9 @@
 
 source <(run/configuration-parser.py --ini config.ini)
 
-dvc run -d ${process[training]} -d ${process[test]} -d ${script[modeling]} \
-        -o ${model[model]} \
+dvc run -d ${processing[training]} -d ${processing[test]} -d ${modeling[script]} \
+        -o ${modeling[model]} \
         -f run/03-modeling.dvc \
-        -M ${model[metric]} \
+        -M ${modeling[metric]} \
         --overwrite-dvcfile \
-        python ${script[modeling]}
+        python ${modeling[entry_point]}

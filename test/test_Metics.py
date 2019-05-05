@@ -13,7 +13,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
-from utils import DataFrameMetric, RMSEMetric
+from lib import DataFrameMetric, RMSEMetric
 
 def iris_dataframe() -> pd.DataFrame:
     data_iris = load_iris()
@@ -52,21 +52,17 @@ class MetricTest(unittest.TestCase):
             metric.add_data(test=df_test)
             metric.save_metrics()
 
-            keys = ["user","timestamp","name","train_nrow","train_ncol",
-                    "test_nrow", "test_ncol"]
+            keys = ["user","timestamp","name","train_shape","test_shape"]
 
             k2v = dict()
             with metric_path.open("r") as fo:
                 for line in fo:
                     row = line.rstrip().split(": ")
                     self.assertTrue(len(row) >= 2)
-                    self.assertIn(row[0],keys)
+                    self.assertIn(row[0].rstrip(),keys)
                     k2v[row[0]] = row[1]
 
-            self.assertEqual(int(k2v["train_nrow"]), 91)
-            self.assertEqual(int(k2v["train_ncol"]), 5)
-            self.assertEqual(int(k2v["test_nrow"]), 150 - 91)
-            self.assertEqual(int(k2v["test_ncol"]), 5)
+            self.assertEqual(k2v["train_shape"], "91 x 5")
 
 
     def test_RMSEMetric(self):
@@ -88,7 +84,7 @@ class MetricTest(unittest.TestCase):
 
         with GoToTempDir() as tmp_dir:
             metric_path = tmp_dir.joinpath("metric.txt")
-            metric = RMSEMetric(str(metric_path))
+            metric = RMSEMetric(str(metric_path), name="test")
 
             ## rmse must be non-negative
             with self.assertRaises(AttributeError):
@@ -115,7 +111,7 @@ class MetricTest(unittest.TestCase):
                 for line in fo:
                     vals = line.rstrip().split(": ")
                     self.assertTrue(len(vals) >= 2)
-                    metric_dict[vals[0]] = vals[1]
+                    metric_dict[vals[0].rstrip()] = vals[1]
 
             self.assertAlmostEqual(float(metric_dict["rmse_test"]),27.258223349178355)
             self.assertAlmostEqual(float(metric_dict["rmse_train"]), 21.555756107437798)
@@ -143,7 +139,7 @@ class MetricTest(unittest.TestCase):
 
         with GoToTempDir() as tmp_dir:
             metric_path = tmp_dir.joinpath("metric.txt")
-            metric = RMSEMetric(str(metric_path))
+            metric = RMSEMetric(str(metric_path), name="test")
             metric.rmse_train = train_loss
             metric.read_off_cv_results_(model)
             metric.rmse_test = test_loss
@@ -154,7 +150,7 @@ class MetricTest(unittest.TestCase):
                 for line in fo:
                     vals = line.rstrip().split(": ")
                     self.assertTrue(len(vals) >= 2)
-                    metric_dict[vals[0]] = vals[1]
+                    metric_dict[vals[0].rstrip()] = vals[1]
 
             self.assertAlmostEqual(float(metric_dict["rmse_test"]),40.73907557425112)
             self.assertAlmostEqual(float(metric_dict["rmse_train"]), 29.51089563013877)
